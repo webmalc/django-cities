@@ -24,37 +24,39 @@ import os
 import re
 import sys
 import zipfile
+from itertools import chain
+from optparse import make_option
+
+from django import VERSION as django_version
+from django.contrib.gis.gdal.envelope import Envelope
+from django.contrib.gis.geos import Point
+from django.contrib.gis.measure import D
+from django.core.management.base import BaseCommand
+from django.db import transaction
+from django.db.models import CharField, ForeignKey, Q
+from swapper import load_model
+from tqdm import tqdm
+
+from ...conf import (CURRENCY_SYMBOLS, INCLUDE_AIRPORT_CODES,
+                     INCLUDE_NUMERIC_ALTERNATIVE_NAMES,
+                     NO_LONGER_EXISTENT_COUNTRY_CODES,
+                     SKIP_CITIES_WITH_EMPTY_REGIONS, VALIDATE_POSTAL_CODES,
+                     HookException, city_types, district_types, import_opts,
+                     import_opts_all, settings)
+from ...models import AlternativeName, District, PostalCode, Region, Subregion
+from ...util import geo_distance
 
 try:
     from urllib.request import urlopen
 except ImportError:
     from urllib import urlopen
 
-from itertools import chain
-from optparse import make_option
-from swapper import load_model
-from tqdm import tqdm
 
-from django import VERSION as django_version
-from django.contrib.gis.gdal.envelope import Envelope
-from django.contrib.gis.geos import Point
-from django.contrib.gis.measure import D
 try:
     from django.contrib.gis.db.models.functions import Distance
 except ImportError:
     pass
-from django.core.management.base import BaseCommand
-from django.db import transaction
-from django.db.models import Q
-from django.db.models import CharField, ForeignKey
 
-from ...conf import (city_types, district_types, import_opts, import_opts_all,
-                     HookException, settings, CURRENCY_SYMBOLS,
-                     INCLUDE_AIRPORT_CODES, INCLUDE_NUMERIC_ALTERNATIVE_NAMES,
-                     NO_LONGER_EXISTENT_COUNTRY_CODES,
-                     SKIP_CITIES_WITH_EMPTY_REGIONS, VALIDATE_POSTAL_CODES)
-from ...models import (Region, Subregion, District, PostalCode, AlternativeName)
-from ...util import geo_distance
 
 
 # Interpret all files as utf-8
@@ -1005,6 +1007,11 @@ class Command(BaseCommand):
                             Q(name__iexact=pc.subregion_name),
                             region__country=pc.country)
                 except Subregion.DoesNotExist:
+                    pc.subregion = None
+                except Subregion.MultipleObjectsReturned:
+                    self.logger.warn("Found multiple subregions for '{}' in '{}' - ignoring".format(
+                        pc.region_name,
+                        pc.subregion_name))
                     pc.subregion = None
             else:
                 pc.subregion = None

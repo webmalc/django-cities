@@ -11,5 +11,9 @@ dist
 .DAV/
 .env
 
+.cache
+.mypy_cache
+.vscode
+
 # Data files
 /cities/data/*
