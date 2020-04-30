@@ -12,18 +12,18 @@ django-cities provides you with place related models (eg. Country, Region, City)
 
 This package officially supports all currently supported versions of Python/Django:
 
-|      Python   | 3.6                 | 3.7                   | 3.8                   |
-| :------------ | ------------------- | --------------------- | --------------------- |
-| Django 1.11   | :white_check_mark:  | :white_check_mark:    | :large_blue_circle:   |
-| Django 2.2    | :white_check_mark:  | :white_check_mark:    | :white_check_mark:    |
-| Django 3.0    | :white_check_mark:  | :white_check_mark:    | :white_check_mark:    |
+| Python                                                                  | 3.6                 | 3.7                 | 3.8                 |
+| :---------------------------------------------------------------------- | ------------------- | ------------------- | ------------------- |
+| Django 1.11                                                             | :white_check_mark:  | :white_check_mark:  | :large_blue_circle: |
+| Django 2.2                                                              | :white_check_mark:  | :white_check_mark:  | :white_check_mark:  |
+| Django 3.0                                                              | :white_check_mark:  | :white_check_mark:  | :white_check_mark:  |
 | Django [master](https://github.com/django/django/archive/master.tar.gz) | :large_blue_circle: | :large_blue_circle: | :large_blue_circle: |
 
-| Key                   |                                                                     |
-| :-------------------: | :------------------------------------------------------------------ |
-| :white_check_mark:    | Officially supported, tested, and passing                           |
-| :large_blue_circle:   | Tested and passing, but not officially supported                    |
-| :x:                   | Known incompatibilities                                             |
+|         Key         |                                                  |
+| :-----------------: | :----------------------------------------------- |
+| :white_check_mark:  | Officially supported, tested, and passing        |
+| :large_blue_circle: | Tested and passing, but not officially supported |
+|         :x:         | Known incompatibilities                          |
 
 Authored by [Ben Dowling](http://www.coderholic.com), and some great [contributors](https://github.com/coderholic/django-cities/contributors).
 
@@ -129,7 +129,7 @@ class CustomCountryModel(BaseCountry, models.Model):
 
 Then you will need to configure your project by setting the appropriate option:
 
-|   Model   |       Setting Name       |    Default Value   |
+| Model     | Setting Name             | Default Value      |
 | :-------- | :----------------------- | :----------------- |
 | Continent | `CITIES_CONTINENT_MODEL` | `cities.Continent` |
 | Country   | `CITIES_COUNTRY_MODEL`   | `cities.Country`   |
@@ -326,7 +326,7 @@ def default_slugify(obj, value):
     if value is None:
         return None
 
-    value = force_text(unicode_func(value))
+    value = force_str(unicode_func(value))
     value = unicodedata.normalize('NFKC', value.strip())
     value = re.sub(to_und_rgx, '_', value)
     value = re.sub(slugify_rgx, '-', value)

@@ -5,9 +5,9 @@ import unicodedata
 from math import radians, sin, cos, acos
 from django import VERSION as DJANGO_VERSION
 try:
-    from django.utils.encoding import force_unicode as force_text
+    from django.utils.encoding import force_unicode as force_str
 except (NameError, ImportError):
-    from django.utils.encoding import force_text
+    from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe, SafeText
 
 from .conf import CONTINENT_DATA
@@ -64,7 +64,7 @@ def default_slugify(obj, value):
     if value is None:
         return None
 
-    value = force_text(unicode_func(value))
+    value = force_str(unicode_func(value))
     value = unicodedata.normalize('NFKC', value.strip())
     value = re.sub(to_und_rgx, '_', value)
     value = re.sub(slugify_rgx, '-', value)

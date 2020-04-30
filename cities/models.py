@@ -1,22 +1,23 @@
 from random import choice
 from string import ascii_uppercase, digits
 
-try:
-    from django.utils.encoding import force_unicode as force_text
-except (NameError, ImportError):
-    from django.utils.encoding import force_text
-
-from django.db import transaction
-from django.contrib.gis.db.models import PointField
-from django.db import models
-from django.contrib.gis.geos import Point
-
-from model_utils import Choices
 import swapper
+from django.contrib.gis.db.models import PointField
+from django.contrib.gis.geos import Point
+from django.db import models, transaction
+from model_utils import Choices
 
-from .conf import (ALTERNATIVE_NAME_TYPES, SLUGIFY_FUNCTION, DJANGO_VERSION)
+from .conf import ALTERNATIVE_NAME_TYPES, DJANGO_VERSION, SLUGIFY_FUNCTION
 from .managers import AlternativeNameManager
 from .util import unicode_func
+
+try:
+    from django.utils.encoding import force_unicode as force_str
+except (NameError, ImportError):
+    from django.utils.encoding import force_str
+
+
+
 
 __all__ = [
     'Point', 'Continent', 'Country', 'Region', 'Subregion', 'City', 'District',
@@ -91,7 +92,7 @@ class Place(models.Model):
         return "/".join([place.slug for place in self.hierarchy])
 
     def __str__(self):
-        return force_text(self.name)
+        return force_str(self.name)
 
     def save(self, *args, **kwargs):
         if hasattr(self, 'clean'):
@@ -103,7 +104,7 @@ class BaseContinent(Place, SlugModel):
     code = models.CharField(max_length=2, unique=True, db_index=True)
 
     def __str__(self):
-        return force_text(self.name)
+        return force_str(self.name)
 
     class Meta:
         abstract = True
@@ -147,7 +148,7 @@ class BaseCountry(Place, SlugModel):
         return None
 
     def __str__(self):
-        return force_text(self.name)
+        return force_str(self.name)
 
     def clean(self):
         self.tld = self.tld.lower()
@@ -292,7 +293,7 @@ class AlternativeName(SlugModel):
     objects = AlternativeNameManager()
 
     def __str__(self):
-        return "%s (%s)" % (force_text(self.name), force_text(self.language_code))
+        return "%s (%s)" % (force_str(self.name), force_str(self.language_code))
 
     def slugify(self):
         if self.id:
@@ -351,21 +352,21 @@ class PostalCode(Place, SlugModel):
     @property
     def name_full(self):
         """Get full name including hierarchy"""
-        return force_text(', '.join(reversed(self.names)))
+        return force_str(', '.join(reversed(self.names)))
 
     @property
     def names(self):
         """Get a hierarchy of non-null names, root first"""
         return [e for e in [
-            force_text(self.country),
-            force_text(self.region_name),
-            force_text(self.subregion_name),
-            force_text(self.district_name),
-            force_text(self.name),
+            force_str(self.country),
+            force_str(self.region_name),
+            force_str(self.subregion_name),
+            force_str(self.district_name),
+            force_str(self.name),
         ] if e]
 
     def __str__(self):
-        return force_text(self.code)
+        return force_str(self.code)
 
     def slugify(self):
         if self.id:
