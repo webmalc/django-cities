@@ -282,10 +282,15 @@ class AlternativeName(SlugModel):
 
     KIND = Choices(*ALTERNATIVE_NAME_TYPES)
 
-    name = models.CharField(max_length=255)
-    kind = models.CharField(max_length=4, choices=KIND, default=KIND.name)
-    language_code = models.CharField(max_length=100)
-    is_preferred = models.BooleanField(default=False)
+    name = models.CharField(max_length=255, db_index=True)
+    kind = models.CharField(
+        max_length=4,
+        choices=KIND,
+        default=KIND.name,
+        db_index=True,
+    )
+    language_code = models.CharField(max_length=100, db_index=True)
+    is_preferred = models.BooleanField(default=False, db_index=True)
     is_short = models.BooleanField(default=False)
     is_colloquial = models.BooleanField(default=False)
     is_historic = models.BooleanField(default=False)
